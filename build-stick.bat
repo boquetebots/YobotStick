@@ -52,6 +52,12 @@ REM  OhbotPi2 on both machines; the repo it came from never was.
 set "OHBOT_URL=https://github.com/boquetebots/OhbotPi.git"
 set "CHESS_URL=https://github.com/boquetebots/YobotChess.git"
 
+REM  Where the show's recordings come from. They are gitignored - 16 MB of
+REM  .wav, regenerable - so they cannot come out of a clone, and without them
+REM  the offline show is silent. Note this is the working STICK, not
+REM  D:\Projects\OhbotPi2, which has no voice_cache folder at all.
+set "VOICE_SRC=D:\Projects\YobotStick\OhbotPi2\voice_cache"
+
 set "PY_URL=https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
 set "GETPIP_URL=https://bootstrap.pypa.io/get-pip.py"
 
@@ -116,6 +122,25 @@ REM ===========================================================================
 
 call :SAY "  [1/9] Checking your local copy is level with GitHub..."
 
+REM  Two different mismatches are possible here and only ONE of them is a
+REM  problem. The first version of this script treated them the same and
+REM  stopped a build that was perfectly safe, which is worse than useless -
+REM  it teaches you to reach for 'force', and then 'force' stops meaning
+REM  anything on the day it matters.
+REM
+REM    GitHub AHEAD of this PC  - the Mac pushed work this PC has not pulled.
+REM                               Building from GitHub ships the NEWER code,
+REM                               which is what you want. Carry on.
+REM    This PC AHEAD of GitHub  - this PC has commits GitHub has never seen.
+REM                               Building from GitHub would silently ship
+REM                               OLDER code than the machine you are sat at.
+REM                               Stop.
+REM    Diverged                 - both have commits the other lacks. Stop,
+REM                               because nobody can say which is correct.
+REM
+REM  merge-base --is-ancestor answers this. It exits 0 when the first commit
+REM  is an ancestor of the second.
+
 if not exist "%LOCAL_OHBOT%\.git" (
     call :SAY "        [!] No git copy at %LOCAL_OHBOT% - skipping this check."
     call :SAY "            The build will use whatever is on GitHub."
@@ -133,29 +158,67 @@ for /f %%i in ('git -C "%LOCAL_OHBOT%" rev-parse origin/main 2^>nul') do set "OR
 set "DIRTY="
 for /f "delims=" %%i in ('git -C "%LOCAL_OHBOT%" status --porcelain 2^>nul') do set "DIRTY=1"
 
-if defined DIRTY (
-    call :SAY ""
-    call :SAY "        [!] STOP. %LOCAL_OHBOT% has changes that are not committed."
-    call :SAY "            Those changes will NOT be in the download."
-    call :SAY "            Commit and push them first, or run:  build-stick.bat force"
-    call :SAY ""
-    if /i not "%~1"=="force" goto FAIL
-    call :SAY "        'force' given - carrying on anyway."
+if not defined DIRTY goto SYNCCHECK
+call :SAY ""
+call :SAY "        [!] STOP. %LOCAL_OHBOT% has changes that are not committed."
+call :SAY "            Those changes will NOT be in the download."
+call :SAY "            Commit and push them first, or run:  build-stick.bat force"
+call :SAY ""
+if /i not "%~1"=="force" goto FAIL
+call :SAY "        'force' given - carrying on anyway."
+
+:SYNCCHECK
+if not defined LOCAL_SHA goto SKIPSYNC
+if not defined ORIGIN_SHA goto SKIPSYNC
+if "%LOCAL_SHA%"=="%ORIGIN_SHA%" (
+    call :SAY "        ok - this PC and GitHub match."
+    goto SKIPSYNC
 )
 
-if not "%LOCAL_SHA%"=="%ORIGIN_SHA%" (
-    call :SAY ""
-    call :SAY "        [!] STOP. This PC and GitHub are not on the same commit."
-    call :SAY "              this PC: %LOCAL_SHA%"
-    call :SAY "              GitHub : %ORIGIN_SHA%"
-    call :SAY "            The download is built from GitHub, so it would ship"
-    call :SAY "            the GitHub one. Push first, or run: build-stick.bat force"
-    call :SAY ""
-    if /i not "%~1"=="force" goto FAIL
-    call :SAY "        'force' given - carrying on anyway."
-)
+git -C "%LOCAL_OHBOT%" merge-base --is-ancestor %LOCAL_SHA% %ORIGIN_SHA% >nul 2>&1
+if not errorlevel 1 goto BEHIND
+git -C "%LOCAL_OHBOT%" merge-base --is-ancestor %ORIGIN_SHA% %LOCAL_SHA% >nul 2>&1
+if not errorlevel 1 goto AHEAD
+goto DIVERGED
 
-if not defined DIRTY if "%LOCAL_SHA%"=="%ORIGIN_SHA%" call :SAY "        ok - this PC and GitHub match."
+:BEHIND
+call :SAY "        ok - GitHub is ahead of this PC, which is the safe way round."
+call :SAY "             this PC: %LOCAL_SHA%"
+call :SAY "             GitHub : %ORIGIN_SHA%"
+call :SAY "             The download gets GitHub's newer code. Nothing is lost."
+call :SAY ""
+call :SAY "             Worth knowing: that newer code has not been run on THIS"
+call :SAY "             machine. Do the 'click what a stranger clicks' check in"
+call :SAY "             BUILD.md once the ZIP is made. Pulling on this PC later"
+call :SAY "             would keep the two in step."
+goto SKIPSYNC
+
+:AHEAD
+call :SAY ""
+call :SAY "        [!] STOP. This PC has commits GitHub has never seen."
+call :SAY "              this PC: %LOCAL_SHA%"
+call :SAY "              GitHub : %ORIGIN_SHA%"
+call :SAY "            The download is built from GitHub, so it would ship code"
+call :SAY "            OLDER than what is on this machine, and look fine doing"
+call :SAY "            it. Push first, or run:  build-stick.bat force"
+call :SAY ""
+if /i not "%~1"=="force" goto FAIL
+call :SAY "        'force' given - carrying on anyway."
+goto SKIPSYNC
+
+:DIVERGED
+call :SAY ""
+call :SAY "        [!] STOP. This PC and GitHub have each got commits the other"
+call :SAY "            has not. They have genuinely split."
+call :SAY "              this PC: %LOCAL_SHA%"
+call :SAY "              GitHub : %ORIGIN_SHA%"
+call :SAY "            Sort that out in the robot project before building - no"
+call :SAY "            script can decide which of the two is the right one."
+call :SAY "            Or run:  build-stick.bat force  to ship GitHub's side."
+call :SAY ""
+if /i not "%~1"=="force" goto FAIL
+call :SAY "        'force' given - shipping GitHub's side."
+goto SKIPSYNC
 
 :SKIPSYNC
 call :SAY ""
@@ -292,58 +355,86 @@ REM  some packages reach for pkg_resources at run time, so it buys an
 REM  unexplainable import error on a stranger's laptop for 12 MB. Not worth it.
 
 REM ===========================================================================
-REM  STEP 7  -  take out what must not ship
+REM  STEP 7  -  cut it down to EXACTLY what a stick contains
+REM ===========================================================================
+REM  This replaces the old "delete the three files we know about" step, which
+REM  was not good enough. The git export is the WHOLE robot project - Mac,
+REM  Raspberry Pi and Windows together - and a stick is Windows only. Naming
+REM  the bad files one at a time means every new Mac or Pi file added to the
+REM  robot project silently lands on the next stick.
+REM
+REM  So it works the other way round now: stick-manifest.txt says what a stick
+REM  contains, and anything else in the pruned folders goes. A new Mac file
+REM  drops out on its own, and a missing required file stops the build in
+REM  step 8b rather than turning up on a stranger's laptop.
 REM ===========================================================================
 
-call :SAY "  [7/9] Removing what must not go in the download..."
+set "MANIFEST=%REPO%\stick-manifest.txt"
+if not exist "%MANIFEST%" (
+    call :SAY "        [X] stick-manifest.txt is missing. Cannot tell what belongs."
+    goto FAIL
+)
 
-REM  Keys. git archive cannot produce these, so this is belt and braces - but
-REM  belt and braces is the right posture for a public download.
+call :SAY "  [7/9] Cutting down to what a stick actually contains..."
+
+REM  Keys and logs first. git archive cannot produce these, but belt and
+REM  braces is the right posture for a public download.
 if exist "%STICK%\OhbotPi2\.env" del /q "%STICK%\OhbotPi2\.env"
 if exist "%STICK%\Chess\.env" del /q "%STICK%\Chess\.env"
 if exist "%STICK%\OhbotPi2\git_keys.txt" del /q "%STICK%\OhbotPi2\git_keys.txt"
-
-REM  Logs can contain transcripts of what people said to the robot.
 if exist "%STICK%\OhbotPi2\logs" rd /s /q "%STICK%\OhbotPi2\logs"
 if exist "%STICK%\Chess\logs" rd /s /q "%STICK%\Chess\logs"
-
-REM  __pycache__ - a couple of hundred folders of nothing useful.
 for /d /r "%STICK%" %%d in (__pycache__) do if exist "%%d" rd /s /q "%%d"
 
-REM  --- the two files written for the INSTALLED route, which are wrong here --
-REM
-REM  OhbotPi2\Windows\SETUP.bat builds a second Python at
-REM  %USERPROFILE%\yobot-venv and installs every package into it. On the stick
-REM  that is not just pointless, it dumps 200 MB into a stranger's home folder
-REM  for nothing. And Windows\START HERE.md calls it Step 3.
-if exist "%STICK%\OhbotPi2\Windows\SETUP.bat" del /q "%STICK%\OhbotPi2\Windows\SETUP.bat"
-REM
-REM  catch-up-from-github.bat looks for a .git folder, does not find one on the
-REM  stick, and stops with "This folder is not a git copy of the project."
-REM  Harmless, but baffling, and baffling is the thing to avoid here.
-if exist "%STICK%\OhbotPi2\Windows\catch-up-from-github.bat" del /q "%STICK%\OhbotPi2\Windows\catch-up-from-github.bat"
-REM
-REM  Chess\SETUP.bat is the same story a third time: it builds the venv AND
-REM  downloads Stockfish. On the stick, GET THE CHESS ENGINE.bat does the
-REM  engine and nothing needs a venv.
-if exist "%STICK%\Chess\SETUP.bat" del /q "%STICK%\Chess\SETUP.bat"
-
-call :SAY "        ok"
+REM  Now the allow list, over the three folders that need filtering. Anything
+REM  deeper comes across whole.
+set "DROPPED=0"
+call :PRUNE "OhbotPi2"
+call :PRUNE "OhbotPi2\Windows"
+call :PRUNE "Chess"
+call :SAY "        %DROPPED% item(s) dropped - each one listed in the log."
 call :SAY ""
 
 REM ===========================================================================
-REM  STEP 8  -  put the stick's own files on top
+REM  STEP 8  -  the recordings, the stick's own files, and the check
 REM ===========================================================================
 
-call :SAY "  [8/9] Adding the stick's own files..."
+call :SAY "  [8/9] Adding the recordings and the stick's own files..."
 
-REM  The corrected chess launchers. See chess-overrides\ and BUILD.md - the
-REM  repo versions look for %USERPROFILE%\yobot-venv BEFORE the stick's own
-REM  Python, which is right on an installed machine and wrong here.
+REM  --- 8a. voice_cache ------------------------------------------------------
+REM  THE OFFLINE SHOW IS THE WHOLE POINT OF THIS DOWNLOAD, and it cannot work
+REM  without these. The recordings are deliberately gitignored - they are 16 MB
+REM  of .wav and regenerable - so a git-only build produces a stick whose
+REM  headline feature is silent. The v1.0 ZIP had exactly that fault.
+REM
+REM  They are copied from disk instead. A .wav cannot carry an API key, so
+REM  this does not weaken the no-keys-in-the-download guarantee.
+REM
+REM  Note the source: the working stick, NOT D:\Projects\OhbotPi2, which has
+REM  no voice_cache folder at all.
+if not exist "%VOICE_SRC%" (
+    call :SAY "        [X] No recordings found at:"
+    call :SAY "            %VOICE_SRC%"
+    call :SAY ""
+    call :SAY "            Without these, YOBOT SHOW has no voice - and that is"
+    call :SAY "            the one thing the guides tell people to rely on with"
+    call :SAY "            no internet. Not shipping a silent stick."
+    goto FAIL
+)
+xcopy /e /i /y /q "%VOICE_SRC%" "%STICK%\OhbotPi2\voice_cache\" >> "%LOG%" 2>&1
+if errorlevel 1 goto FAIL
+set "NWAV=0"
+for %%F in ("%STICK%\OhbotPi2\voice_cache\*.wav") do set /a NWAV+=1
+call :SAY "        ok - %NWAV% recordings copied in."
+
+REM  --- 8b. the corrected chess launchers ------------------------------------
+REM  The repo versions look for %USERPROFILE%\yobot-venv BEFORE the stick's own
+REM  Python, which is right on an installed machine and wrong here. See
+REM  chess-overrides\ and BUILD.md.
 copy /y "%REPO%\chess-overrides\*.bat" "%STICK%\Chess\" >> "%LOG%" 2>&1
 if errorlevel 1 goto FAIL
 
-REM  And the top-level files people actually click.
+REM  --- 8c. the files people actually click ----------------------------------
 xcopy /e /i /y /q "%REPO%\stick-root\*" "%STICK%\" >> "%LOG%" 2>&1
 if errorlevel 1 goto FAIL
 
@@ -353,10 +444,23 @@ echo Built      %DATE%
 echo OhbotPi    %OHBOT_SHA%
 echo Chess      %CHESS_SHA%
 echo Python     3.11.9 embeddable
+echo Recordings %NWAV% files
 echo Stockfish  18  ^(sf_18, x86-64 plain build^) - fetched, not included
 ) > "%STICK%\VERSION.txt"
 
-call :SAY "        ok"
+REM  --- 8d. is everything the manifest promises actually here? ---------------
+REM  The half of the allow list that earns its keep. Dropping the wrong file is
+REM  loud and immediate here, instead of silent until somebody double-clicks.
+call :SAY "        checking every file the manifest promises is present..."
+set "MISSING=0"
+for /f "usebackq eol=# delims=" %%L in ("%MANIFEST%") do call :NEEDS "%%L"
+if not "%MISSING%"=="0" (
+    call :SAY ""
+    call :SAY "        [X] %MISSING% thing(s) the manifest promises are not in the"
+    call :SAY "            build. Listed above. Nothing was published."
+    goto FAIL
+)
+call :SAY "        ok - nothing promised is missing."
 call :SAY ""
 
 REM ===========================================================================
@@ -382,7 +486,7 @@ call :SAY "  ===================================================================
 call :SAY ""
 call :SAY "    %OUT%\%ZIPNAME%"
 call :SAY ""
-call :SAY "    OhbotPi %OHBOT_SHA%   Chess %CHESS_SHA%"
+call :SAY "    OhbotPi %OHBOT_SHA%   Chess %CHESS_SHA%   %NWAV% recordings"
 call :SAY ""
 call :SAY "    Before you upload it to a GitHub Release, do the two checks in"
 call :SAY "    BUILD.md under 'Before you publish'. They take one minute and"
@@ -390,6 +494,33 @@ call :SAY "    they are the difference between a download and an incident."
 call :SAY ""
 pause
 endlocal
+exit /b 0
+
+REM ===========================================================================
+REM  Helpers
+REM ===========================================================================
+
+REM  Delete everything in folder %~1 that the manifest does not name.
+:PRUNE
+if not exist "%STICK%\%~1" exit /b 0
+for /f "delims=" %%E in ('dir /b "%STICK%\%~1" 2^>nul') do (
+    findstr /x /i /c:"%~1\%%E" "%MANIFEST%" >nul 2>&1
+    if errorlevel 1 call :DROP "%~1\%%E"
+)
+exit /b 0
+
+:DROP
+call :SAY "        - dropped  %~1"
+if exist "%STICK%\%~1\" (rd /s /q "%STICK%\%~1") else (del /q "%STICK%\%~1")
+set /a DROPPED+=1
+exit /b 0
+
+REM  Complain if something the manifest promises is not in the build.
+:NEEDS
+if exist "%STICK%\%~1" exit /b 0
+if exist "%STICK%\%~1\" exit /b 0
+call :SAY "        - MISSING  %~1"
+set /a MISSING+=1
 exit /b 0
 
 REM ===========================================================================

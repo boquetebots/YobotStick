@@ -1,0 +1,169 @@
+# ===========================================================================
+#  stick-manifest.txt  -  EXACTLY what a Yobot stick contains
+# ===========================================================================
+#
+#  This is an ALLOW LIST, taken from the working stick at
+#  D:\Projects\YobotStick on 2026-09-19. build-stick.bat deletes anything in
+#  the three pruned folders below that is not named here, and REFUSES TO
+#  BUILD if anything named here is missing.
+#
+#  WHY THIS FILE EXISTS
+#  --------------------
+#  The first build used the robot repo's own export-ignore rules instead.
+#  That was wrong, and not obviously wrong, which is the dangerous kind.
+#  export-ignore trims the GENERAL GitHub download - the one that has to
+#  serve Mac, Pi and Windows people at once. A Windows-only stick needs a
+#  narrower list. The v1.0 ZIP built that way carried Mac\, Raspberry Pi\,
+#  yobot_mac.py, install.sh, three .command files and four Pi shell scripts
+#  onto a Windows stick, and left OUT voice_cache, without which the offline
+#  show has no voice at all.
+#
+#  So: reuse a list only after checking what it was written for.
+#
+#  HOW TO CHANGE IT
+#  ----------------
+#  Add a line to add a file to the stick. Delete a line to drop one. A folder
+#  named here is taken whole - only the three folders marked [prune] below are
+#  filtered at all; everything else comes across complete.
+#
+#  If the robot project gains a genuinely new Windows file, the build will
+#  quietly leave it out until it is added here. That is the trade for having
+#  Mac and Pi files drop out on their own. The build prints every file it
+#  drops, so a surprise shows up in the log rather than on a stranger's laptop.
+#
+#  Paths are relative to the top of the stick, and use backslashes.
+#
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+#  [prune]  OhbotPi2
+# ---------------------------------------------------------------------------
+#  NOT listed, on purpose:
+#    library_knowledge.json - holds the library's wifi password. It is
+#        gitignored so it never reaches the build anyway, but it is named here
+#        so nobody "helpfully" adds it back. Yobot simply knows less about the
+#        library; that is the correct trade for a public download.
+#    Mac\, Raspberry Pi\, yobot_mac.py, install.sh, the .sh and .command
+#        files, announce_ip.py - another platform's problem.
+#    yobot_calibrate.py, eye_speed_test.py - bench tools, not for strangers.
+
+OhbotPi2\.env.example
+OhbotPi2\calibration
+OhbotPi2\calibration_server.py
+OhbotPi2\clubhouse_knowledge.json
+OhbotPi2\compact.js
+OhbotPi2\cue_editor.py
+OhbotPi2\demo_cues.json
+OhbotPi2\Getting your API keys.md
+OhbotPi2\guardrails.py
+OhbotPi2\gui
+OhbotPi2\gui_server.py
+OhbotPi2\i18n.js
+OhbotPi2\knowledge_base.py
+OhbotPi2\knowledge.json
+OhbotPi2\launcher
+OhbotPi2\launcher_server.py
+OhbotPi2\LEE ESTO PRIMERO (Espanol).txt
+OhbotPi2\LICENSE
+OhbotPi2\llm.py
+OhbotPi2\Obtener tus llaves API (Espanol).md
+OhbotPi2\ohbot_azure.py
+OhbotPi2\ohbot_chat.py
+OhbotPi2\ohbot_lang.py
+OhbotPi2\ohbot_logging.py
+OhbotPi2\ohbot_mic.py
+OhbotPi2\ohbot_pi.py
+OhbotPi2\ohbotchat_server.py
+OhbotPi2\ohbotData
+OhbotPi2\prerender_cues.py
+OhbotPi2\READ ME FIRST.txt
+OhbotPi2\README.md
+OhbotPi2\requirements.txt
+OhbotPi2\reword.py
+OhbotPi2\robot_profiles.py
+OhbotPi2\sequences
+OhbotPi2\settings.py
+OhbotPi2\show_server.py
+OhbotPi2\thinking_chime.wav
+OhbotPi2\timeline_server.py
+OhbotPi2\venue.py
+OhbotPi2\voice_cache
+OhbotPi2\voice_cache.py
+OhbotPi2\win_audio_check.py
+OhbotPi2\Windows
+OhbotPi2\yobot_core.py
+OhbotPi2\yobot_win.py
+
+
+# ---------------------------------------------------------------------------
+#  [prune]  OhbotPi2\Windows
+# ---------------------------------------------------------------------------
+#  NOT listed, on purpose:
+#    SETUP.bat - builds a venv at %USERPROFILE%\yobot-venv and installs every
+#        package into it. On the stick that dumps a second 200 MB Python into
+#        a stranger's home folder for nothing.
+#    catch-up-from-github.bat - looks for a .git folder, does not find one on
+#        a stick, and stops with a message that means nothing to the reader.
+#
+#  START HERE.md IS listed, because the working stick has it - but it still
+#  calls SETUP.bat Step 3, so on the stick it is wrong. START HERE (stick).md
+#  at the top of the drive is the one people are pointed at, and it says up
+#  front to ignore any guide mentioning SETUP.bat. Worth fixing properly.
+
+OhbotPi2\Windows\EMPIEZA AQUI (Espanol).md
+OhbotPi2\Windows\GUIA DEL DIRECTOR (Espanol).md
+OhbotPi2\Windows\Reference - Windows in detail.md
+OhbotPi2\Windows\START HERE.md
+OhbotPi2\Windows\yobot-launcher.bat
+OhbotPi2\Windows\yobot-show.bat
+OhbotPi2\Windows\yobot-stop.bat
+OhbotPi2\Windows\yobot-test.bat
+OhbotPi2\Windows\yobot.bat
+
+
+# ---------------------------------------------------------------------------
+#  [prune]  Chess
+# ---------------------------------------------------------------------------
+#  NOT listed, on purpose:
+#    SETUP.bat - builds the venv AND downloads Stockfish. On the stick,
+#        GET THE CHESS ENGINE.bat does the engine and nothing needs a venv.
+#    stockfish-windows-x86-64-avx2.exe - 109 MB, GPL-3, and the wrong build
+#        anyway. Fetched by GET THE CHESS ENGINE.bat, pinned to sf_18 plain.
+#    START HERE - Mac.md, START HERE - Raspberry Pi.md, MAC_SETUP.md,
+#        EMPIEZA AQUI - Mac / Raspberry Pi, install.sh - another platform.
+#    test_*.py (seven of them), chess_show_agent.py, chess_templates_plain.py
+#        - bench and development files, not for strangers.
+#    Match start.txt - Michael's own crib sheet of localhost URLs with a
+#        hardcoded 192.168.50.x subnet on it. Not in git, not referenced by
+#        any code, and nobody else's business. Checked 2026-09-19.
+
+Chess\ANIMATION.md
+Chess\black_player.jpg
+Chess\check_stockfish.py
+Chess\chess_animation.py
+Chess\chess_commentary.py
+Chess\chess_dropout.py
+Chess\chess_needs.py
+Chess\chess_ohbot.py
+Chess\chess_player.py
+Chess\chess_server.py
+Chess\chess_show.py
+Chess\chess_speech.py
+Chess\chess_templates_es.py
+Chess\chess_templates.py
+Chess\Demo - no robots.bat
+Chess\EMPIEZA AQUI - Windows (Espanol).md
+Chess\HARDWARE_TEST.md
+Chess\HUMAN_GAME.md
+Chess\LEE ESTO PRIMERO (Espanol).txt
+Chess\Play a Human.bat
+Chess\Play Chess.bat
+Chess\READ ME FIRST.txt
+Chess\README.md
+Chess\requirements.txt
+Chess\show
+Chess\SHOW_SETUP.md
+Chess\START HERE - Windows.md
+Chess\STOCKFISH_SETUP.md
+Chess\white_player.jpg

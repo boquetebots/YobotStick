@@ -7,7 +7,9 @@ For me, later, when I have forgotten all of this.
 ## The short version
 
 1. Push any robot or chess changes to GitHub first.
-2. Double-click `build-stick.bat`. A few minutes.
+2. Double-click `build-stick.bat`. A few minutes. It prunes to
+   `stick-manifest.txt` and stops if anything the manifest promises is
+   missing — read the drop list in the log rather than skimming past it.
 3. Do the two checks under **Before you publish** below. One minute.
 4. Draft a Release on GitHub, attach `dist\Yobot-on-a-Stick-Windows-v1.0.zip`,
    paste `VERSION.txt` into the notes.
@@ -63,26 +65,76 @@ trade worth making.
 
 ---
 
-## Three files the build deletes, and why
+## `stick-manifest.txt` — what a stick actually contains
 
-All three are written for the *installed* route and land on the stick verbatim
-unless stopped.
+**The v1.0 build got this wrong and it is worth understanding why.**
 
-**`OhbotPi2\Windows\SETUP.bat`** builds a virtual environment at
-`%USERPROFILE%\yobot-venv` and installs every package into it. On the stick that
-is not merely redundant — it dumps a second 200 MB Python into a stranger's home
-folder for nothing. `Windows\START HERE.md` calls it Step 3, which is why
-`stick-root\START HERE (stick).md` exists and says up front to ignore any guide
-that mentions it.
+The first version pruned by naming the bad files one at a time, on top of the
+robot repo's own `export-ignore` rules. Reusing `export-ignore` looked clever —
+the list already existed and was well commented — but it was written for the
+**general GitHub download**, the one that has to serve Mac, Pi and Windows
+people at once. A Windows-only stick needs a narrower list.
 
-**`OhbotPi2\Windows\catch-up-from-github.bat`** looks for a `.git` folder, does
-not find one on the stick, and stops with *"This folder is not a git copy of the
-project."* Harmless, but baffling, and baffling is exactly what this download
-cannot afford.
+What v1.0 therefore shipped onto a Windows stick: `Mac\`, `Raspberry Pi\`,
+`yobot_mac.py`, `install.sh`, `install_ip_announcer.sh`, `setup_hardening.sh`,
+`setup_pi_logging.sh`, three `.command` files, `announce_ip.py`, two bench
+scripts, `.gitattributes`, `.gitignore` — and in `Chess\`, the Mac and Pi
+guides, `MAC_SETUP.md`, another `install.sh`, seven `test_*.py`,
+`chess_show_agent.py` and `chess_templates_plain.py`. Thirty items.
 
-**`Chess\SETUP.bat`** is the same story a third time — it builds the venv *and*
-downloads Stockfish. On the stick, `GET THE CHESS ENGINE.bat` does the engine
-and nothing needs a venv.
+And it left **`voice_cache\` out**, so the offline show — the one thing both
+guides tell people to rely on in a hall with no wifi — would have had no voice.
+
+**The lesson: reuse a list only after checking what it was written for.**
+
+### How it works now
+
+`stick-manifest.txt` is an **allow list**, taken from the working stick at
+`D:\Projects\YobotStick`. The build deletes anything in the three pruned
+folders that the manifest does not name, and **refuses to build** if anything
+the manifest promises is missing.
+
+An allow list is the right way round here. An exclude list has to be updated
+every time the robot project gains a new Mac or Pi file, and nothing complains
+when it isn't — the file just turns up on a stranger's stick. With an allow
+list, new files drop out on their own, and the cost lands the other way: a
+genuinely new *Windows* file is left out until it is added to the manifest.
+That failure is visible (the build lists every drop) rather than silent.
+
+Only three folders are filtered — `OhbotPi2`, `OhbotPi2\Windows` and `Chess`.
+Everything deeper comes across whole.
+
+### Two files on the stick that do not come from git
+
+Checked 2026-09-19; these are the only two.
+
+- **`OhbotPi2\voice_cache\`** — 24 bilingual recordings, ~16 MB, gitignored
+  because they are large and regenerable. The build copies them from
+  `D:\Projects\YobotStick\OhbotPi2\voice_cache` and **fails if they are not
+  there**, because a silent stick is worse than no stick. Note the source: it
+  is the working stick, **not** `D:\Projects\OhbotPi2`, which has no
+  `voice_cache` folder at all. A `.wav` cannot carry an API key, so taking
+  these from disk does not weaken the no-keys guarantee.
+- **`Chess\Match start.txt`** — a personal crib sheet of localhost URLs with a
+  hardcoded `192.168.50.x` subnet. Not referenced by any code. **Not** shipped.
+
+### Three things deliberately left out that a reader might miss
+
+- **`library_knowledge.json`** holds the library's wifi password. Gitignored, so
+  it never reaches the build anyway, but it is named in the manifest comments so
+  nobody adds it back. Yobot knows less about the library; correct trade.
+- **`SETUP.bat`, in both `OhbotPi2\Windows\` and `Chess\`** — each builds a
+  venv at `%USERPROFILE%\yobot-venv`, which on a stick dumps a second 200 MB
+  Python into a stranger's home folder for nothing. The Chess one also downloads
+  Stockfish, which `GET THE CHESS ENGINE.bat` already does properly.
+- **`catch-up-from-github.bat`** looks for a `.git` folder, doesn't find one on a
+  stick, and stops with a message that means nothing to the reader.
+
+`OhbotPi2\Windows\START HERE.md` **is** shipped, because the working stick has
+it — but it still calls `SETUP.bat` Step 3, so on a stick it is wrong.
+`START HERE (stick).md` at the top of the drive is what people are pointed at,
+and it says up front to ignore any guide mentioning `SETUP.bat`. Still worth
+fixing properly upstream.
 
 ---
 
