@@ -1,0 +1,8 @@
+# Batch files MUST be CRLF. A .bat with bare LF endings misbehaves around
+# labels and goto in Command Prompt, and that is not something to discover on
+# a borrowed laptop. git archive honours this, so the ZIP really does get CRLF.
+*.bat text eol=crlf
+*.inf text eol=crlf
+*.txt text eol=crlf
+
+*.md  text eol=lf

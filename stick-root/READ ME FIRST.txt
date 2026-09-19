@@ -1,0 +1,125 @@
+===========================================================================
+  YOBOT ON A STICK
+  a robot head that listens, thinks and talks back - running from
+  this drive, installing nothing on your computer
+===========================================================================
+
+  NOTHING GETS INSTALLED.
+
+  Python, and every piece of software Yobot needs, is already on this
+  drive. Nothing is copied to your computer, nothing is added to
+  Windows, nothing is left behind afterwards. Unplug the drive and
+  your PC is exactly as it was.
+
+  That also means you do not need to be an administrator, and you do
+  not need the internet.
+
+
+---------------------------------------------------------------------------
+  DO THIS FIRST
+---------------------------------------------------------------------------
+
+  1. Double-click        TEST THIS COMPUTER.bat
+
+     It takes about a minute and tells you, in plain words, whether
+     this machine can run Yobot and whether it can see the robot.
+     Run it on every new computer before anything else.
+
+  2. Then double-click   START YOBOT.bat
+
+     A web page opens in your browser. That page is the control
+     panel: every button is on it.
+
+  3. When you are finished    STOP YOBOT.bat
+
+  Leave the black window open while Yobot is running. Closing it
+  stops the robot. That window is not an error - it is the engine.
+
+  There is more detail in  "START HERE (stick).md"  beside this file.
+
+
+---------------------------------------------------------------------------
+  WHAT WORKS WITH NO INTERNET AND NO ACCOUNTS
+---------------------------------------------------------------------------
+
+      YOBOT SHOW.bat        the pre-recorded show. Voice and all.
+                            This is the one to use in a hall with no
+                            wifi, and the one to trust in front of an
+                            audience.
+
+  That is the honest answer to "will it work at the venue". Yes,
+  that part will.
+
+
+---------------------------------------------------------------------------
+  WHAT NEEDS AN ACCOUNT
+---------------------------------------------------------------------------
+
+  For Yobot to LISTEN and SPEAK ITS OWN WORDS, rather than play
+  recordings, it needs a Microsoft Azure account. Light use costs
+  pennies. It is the only account Yobot cannot do without.
+
+  For Yobot to HOLD A CONVERSATION, it needs one AI account as well -
+  any of OpenAI, Anthropic, Google Gemini or Groq, or Ollama running
+  on your own machine, which needs no account at all.
+
+  There are no keys on this drive. That is deliberate: a drive that
+  gets passed around with live keys on it is how people wake up to a
+  large bill. Put your own in through the Settings and Keys link on
+  the Yobot page - you do not have to edit any file.
+
+  The keys you type in are saved onto this drive, so you only do it
+  once. Remember that if you lend the drive to somebody.
+
+
+---------------------------------------------------------------------------
+  CHESS
+---------------------------------------------------------------------------
+
+      GET THE CHESS ENGINE.bat    run once, needs the internet
+      PLAY A HUMAN CHESS.bat      you against the robot
+      ROBOT v ROBOT CHESS.bat     two robots against each other
+
+  The chess engine is a separate 109 MB program with its own licence,
+  so it is fetched rather than shipped. One run, once, and then chess
+  works offline too.
+
+  The board and the game need no accounts. Only the robot's voice
+  does.
+
+
+---------------------------------------------------------------------------
+  TWO WINDOWS TRAPS WORTH KNOWING ABOUT
+---------------------------------------------------------------------------
+
+  IF YOU DOWNLOADED THIS AS A ZIP: Windows lets you look inside a ZIP
+  as though it were an ordinary folder. Yobot half-works from in
+  there, in ways that waste an afternoon. Right-click the ZIP, choose
+  "Extract All", and copy the real folder's contents onto the drive.
+
+  WINDOWS MAY WARN YOU about running a .bat file it downloaded -
+  "Windows protected your PC". Click "More info", then "Run anyway".
+  If it still refuses, right-click the file, Properties, and tick
+  "Unblock" at the bottom.
+
+
+---------------------------------------------------------------------------
+  STUCK?
+---------------------------------------------------------------------------
+
+  TEST THIS COMPUTER.bat is the first thing to try again. It is
+  written to explain what it finds rather than just pass or fail.
+
+  Two that catch nearly everybody:
+
+    - Nothing changed after an update?  Your browser is showing you a
+      saved copy of the page. Hold Ctrl and press F5.
+
+    - It greets you, then goes silent?  It is listening to the wrong
+      microphone. The Settings page lets you pick another.
+
+  VERSION.txt on this drive says exactly which version of everything
+  you have. Quote it if you ask anyone for help - it turns a guess
+  into an answer.
+
+===========================================================================

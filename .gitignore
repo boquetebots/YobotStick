@@ -1,0 +1,23 @@
+# Build output. Both are wiped and rewritten on every run of build-stick.bat.
+build/
+dist/
+
+# Logs the scripts write. They can contain paths and git output.
+last build log.txt
+last push log.txt
+
+# Never, under any circumstances, in a repo that publishes downloads.
+.env
+*key*
+*keys*
+*.pat
+git_keys.txt
+
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Handoff notes stay local, same rule as the robot repo.
+HANDOFF_*.md
+CLAUDE.md
