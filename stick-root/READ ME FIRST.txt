@@ -1,125 +1,216 @@
 ===========================================================================
   YOBOT ON A STICK
-  a robot head that listens, thinks and talks back - running from
-  this drive, installing nothing on your computer
+  a robot head that listens, thinks and talks back - running from this
+  drive, installing nothing on your computer
 ===========================================================================
+
+  EN ESPANOL: lee "LEE ESTO PRIMERO (Espanol).txt", aqui mismo.
+
 
   NOTHING GETS INSTALLED.
 
-  Python, and every piece of software Yobot needs, is already on this
-  drive. Nothing is copied to your computer, nothing is added to
-  Windows, nothing is left behind afterwards. Unplug the drive and
-  your PC is exactly as it was.
+  Python, and everything else Yobot needs, is already on this drive.
+  Nothing is copied to your computer, nothing is added to Windows,
+  nothing is left behind. Unplug the drive and your PC is exactly as
+  it was.
 
-  That also means you do not need to be an administrator, and you do
-  not need the internet.
-
-
----------------------------------------------------------------------------
-  DO THIS FIRST
----------------------------------------------------------------------------
-
-  1. Double-click        TEST THIS COMPUTER.bat
-
-     It takes about a minute and tells you, in plain words, whether
-     this machine can run Yobot and whether it can see the robot.
-     Run it on every new computer before anything else.
-
-  2. Then double-click   START YOBOT.bat
-
-     A web page opens in your browser. That page is the control
-     panel: every button is on it.
-
-  3. When you are finished    STOP YOBOT.bat
-
-  Leave the black window open while Yobot is running. Closing it
-  stops the robot. That window is not an error - it is the engine.
-
-  There is more detail in  "START HERE (stick).md"  beside this file.
+  That also means you do not need to be an administrator, and for most
+  of it you do not need the internet.
 
 
 ---------------------------------------------------------------------------
-  WHAT WORKS WITH NO INTERNET AND NO ACCOUNTS
+  WHAT IS ON THIS DRIVE
 ---------------------------------------------------------------------------
 
-      YOBOT SHOW.bat        the pre-recorded show. Voice and all.
-                            This is the one to use in a hall with no
-                            wifi, and the one to trust in front of an
-                            audience.
+  Four things to click, and a folder of extras:
 
-  That is the honest answer to "will it work at the venue". Yes,
-  that part will.
+      TEST THIS COMPUTER.bat   Run this FIRST on any new computer.
+      START YOBOT.bat          Opens Yobot's control page in your browser.
+      STOP YOBOT.bat           Stops everything, however it was started.
+
+      Utilities\               The show, chess, and the version number.
+
+  The folders called OhbotPi2, Chess and python are the machinery. You
+  never need to open them, and they have to stay where they are.
+
+
+---------------------------------------------------------------------------
+  START HERE
+---------------------------------------------------------------------------
+
+  1. Double-click   TEST THIS COMPUTER.bat
+
+     A minute or so. It checks this machine can run Yobot and whether
+     it can see the robot, and it says so in plain words.
+
+  2. Double-click   START YOBOT.bat
+
+     A black window opens, then your browser. That web page is the
+     control panel - every button is on it.
+
+  3. When you have finished, double-click   STOP YOBOT.bat
+
+  LEAVE THE BLACK WINDOW OPEN while Yobot is running. It is not an
+  error message, it is the engine. Closing it stops the robot.
+
+  Yobot waits until it is properly awake before opening your browser,
+  so the page should be ready when it appears. The first run on a new
+  computer takes longer - that is Python waking up off the drive - and
+  it is quicker after that.
+
+
+---------------------------------------------------------------------------
+  PLUGGING THE ROBOT IN
+---------------------------------------------------------------------------
+
+  The robot connects by USB. Plug it in BEFORE you start Yobot. If you
+  plug it in afterwards, stop and start again so it gets noticed.
+
+  You can run Yobot with no robot attached. The control page works;
+  there is just nothing to move.
+
+  THE FIRST TIME, WINDOWS FIREWALL WILL ASK. Click "Allow access".
+  Yobot is not reaching out to the internet there - it is opening a
+  page for your own browser, on your own machine. Refuse, and the page
+  will not load.
+
+
+---------------------------------------------------------------------------
+  IN THE UTILITIES FOLDER
+---------------------------------------------------------------------------
+
+  YOBOT SHOW.bat            The pre-recorded show. Voice and all.
+                            NO INTERNET AND NO ACCOUNTS NEEDED.
+
+  GET THE CHESS ENGINE.bat  Run once, with internet, if you want chess.
+  PLAY A HUMAN CHESS.bat    You against the robot.
+  ROBOT v ROBOT CHESS.bat   Two robots against each other.
+
+  VERSION.txt               Exactly which build this is. Quote it if
+                            you ask anyone for help.
+
+  THE SHOW IS THE ONE TO TRUST in a hall where the wifi cannot be
+  relied on. It plays from recordings already on this drive, so it
+  needs nothing at all from the outside world.
 
 
 ---------------------------------------------------------------------------
   WHAT NEEDS AN ACCOUNT
 ---------------------------------------------------------------------------
 
-  For Yobot to LISTEN and SPEAK ITS OWN WORDS, rather than play
+  For Yobot to LISTEN and to SPEAK ITS OWN WORDS, rather than play
   recordings, it needs a Microsoft Azure account. Light use costs
   pennies. It is the only account Yobot cannot do without.
 
   For Yobot to HOLD A CONVERSATION, it needs one AI account as well -
-  any of OpenAI, Anthropic, Google Gemini or Groq, or Ollama running
-  on your own machine, which needs no account at all.
+  any of OpenAI, Anthropic, Google Gemini or Groq. Or Ollama running
+  on your own computer, which needs no account at all.
 
-  There are no keys on this drive. That is deliberate: a drive that
-  gets passed around with live keys on it is how people wake up to a
-  large bill. Put your own in through the Settings and Keys link on
-  the Yobot page - you do not have to edit any file.
+  YOU DO NOT HAVE TO EDIT ANY FILE. Start Yobot, and on the page that
+  opens click "Settings & Keys". Paste your keys in there and it will
+  test each one and tell you whether it works.
 
-  The keys you type in are saved onto this drive, so you only do it
-  once. Remember that if you lend the drive to somebody.
+  There are no keys on this drive when it arrives. When you add yours
+  they are saved ONTO THE DRIVE - so you only do it once, and so does
+  anyone you lend the drive to. Worth remembering before you hand it
+  over.
+
+  Yobot will tell you when something is missing rather than starting
+  and failing quietly. Chess will not open without its engine, and the
+  conversation bot will not start without a voice key.
 
 
 ---------------------------------------------------------------------------
   CHESS
 ---------------------------------------------------------------------------
 
-      GET THE CHESS ENGINE.bat    run once, needs the internet
-      PLAY A HUMAN CHESS.bat      you against the robot
-      ROBOT v ROBOT CHESS.bat     two robots against each other
+  All three files are in Utilities. Run them in this order:
 
-  The chess engine is a separate 109 MB program with its own licence,
-  so it is fetched rather than shipped. One run, once, and then chess
-  works offline too.
+  1. GET THE CHESS ENGINE.bat - once, with the internet connected.
 
-  The board and the game need no accounts. Only the robot's voice
-  does.
+     The engine is a separate 109 MB program called Stockfish, with its
+     own licence, so it is fetched from its makers rather than carried
+     here. After this one run, chess works offline too.
+
+  2. PLAY A HUMAN CHESS.bat   - a person plays the robot.
+  3. ROBOT v ROBOT CHESS.bat  - two robots play each other.
+
+  The board and the game need no accounts. Only the robot's
+  commentary does, and that is the Azure key above.
 
 
 ---------------------------------------------------------------------------
-  TWO WINDOWS TRAPS WORTH KNOWING ABOUT
+  THREE WINDOWS TRAPS WORTH KNOWING ABOUT
 ---------------------------------------------------------------------------
+
+  UNZIPPING TAKES A FEW MINUTES, and looks like it has stopped. There
+  are several thousand small files here - most of them tiny pieces of
+  Python - and Windows checks every one on the way past. It is slow on
+  a fast computer and slower on an old one.
+
+  Let it finish. A half-extracted copy looks perfectly fine and then
+  fails later in ways nobody can work out. The same goes for deleting
+  it again afterwards, if you ever do.
 
   IF YOU DOWNLOADED THIS AS A ZIP: Windows lets you look inside a ZIP
   as though it were an ordinary folder. Yobot half-works from in
   there, in ways that waste an afternoon. Right-click the ZIP, choose
   "Extract All", and copy the real folder's contents onto the drive.
 
-  WINDOWS MAY WARN YOU about running a .bat file it downloaded -
-  "Windows protected your PC". Click "More info", then "Run anyway".
-  If it still refuses, right-click the file, Properties, and tick
-  "Unblock" at the bottom.
+  WINDOWS MAY WARN YOU about running a file it downloaded - "Windows
+  protected your PC". Click "More info", then "Run anyway". If it
+  still refuses, right-click the file, Properties, and tick "Unblock"
+  at the bottom.
 
 
 ---------------------------------------------------------------------------
-  STUCK?
+  MOVING IT OFF THE DRIVE
 ---------------------------------------------------------------------------
 
-  TEST THIS COMPUTER.bat is the first thing to try again. It is
-  written to explain what it finds rather than just pass or fail.
+  You can copy everything here onto a hard disk and it will still
+  work. Nothing remembers a drive letter, so E: becoming F: on the
+  next machine breaks nothing.
 
-  Two that catch nearly everybody:
+  Keep the folders together. python, OhbotPi2 and Chess must stay
+  beside each other, because that is how they find one another.
 
-    - Nothing changed after an update?  Your browser is showing you a
-      saved copy of the page. Hold Ctrl and press F5.
 
-    - It greets you, then goes silent?  It is listening to the wrong
-      microphone. The Settings page lets you pick another.
+---------------------------------------------------------------------------
+  A NEWER VERSION
+---------------------------------------------------------------------------
 
-  VERSION.txt on this drive says exactly which version of everything
-  you have. Quote it if you ask anyone for help - it turns a guess
+  There is no update button in this version. Download the new ZIP,
+  extract it, and copy the contents over this drive.
+
+  Keep your own things: if you added keys, copy OhbotPi2\.env across
+  afterwards. Your robot's calibration and any sequences you made are
+  in OhbotPi2\ohbotData and OhbotPi2\sequences.
+
+
+---------------------------------------------------------------------------
+  WHEN SOMETHING IS WRONG
+---------------------------------------------------------------------------
+
+  RUN TEST THIS COMPUTER.bat AGAIN. It is written to explain what it
+  finds rather than just pass or fail, and it catches most of it.
+
+  Nothing changed after an update?
+      The browser is showing you a saved copy of the page. Hold Ctrl
+      and press F5.
+
+  It greets you, then goes quiet?
+      It is listening to the wrong microphone. A laptop usually has
+      two or three and Windows does not always pick the one you mean.
+      The Settings page lets you choose.
+
+  Chess says something is missing?
+      Run GET THE CHESS ENGINE.bat in Utilities, with the internet on.
+
+  Windows blocked a file?
+      Right-click it, Properties, tick "Unblock" at the bottom, OK.
+
+  When you ask anyone for help, open Utilities\VERSION.txt and quote
+  it. It says precisely which build you have, which turns guesswork
   into an answer.
 
 ===========================================================================

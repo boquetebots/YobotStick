@@ -112,6 +112,7 @@ OhbotPi2\yobot_win.py
 #  front to ignore any guide mentioning SETUP.bat. Worth fixing properly.
 
 OhbotPi2\Windows\EMPIEZA AQUI (Espanol).md
+OhbotPi2\Windows\open-when-ready.bat
 OhbotPi2\Windows\GUIA DEL DIRECTOR (Espanol).md
 OhbotPi2\Windows\Reference - Windows in detail.md
 OhbotPi2\Windows\START HERE.md

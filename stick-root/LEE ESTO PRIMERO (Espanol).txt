@@ -1,0 +1,220 @@
+===========================================================================
+  YOBOT EN UNA MEMORIA USB
+  una cabeza de robot que escucha, piensa y te contesta - funcionando
+  desde esta memoria, sin instalar nada en tu computadora
+===========================================================================
+
+  IN ENGLISH: read "READ ME FIRST.txt", in this same folder.
+
+
+  NO SE INSTALA NADA.
+
+  Python, y todo lo demas que Yobot necesita, ya viene en esta
+  memoria. No se copia nada a tu computadora, no se agrega nada a
+  Windows, no queda nada atras. Desconectas la memoria y tu PC queda
+  exactamente como estaba.
+
+  Eso tambien quiere decir que no necesitas ser administrador, y que
+  para casi todo no necesitas internet.
+
+
+---------------------------------------------------------------------------
+  QUE HAY EN ESTA MEMORIA
+---------------------------------------------------------------------------
+
+  Tres cosas para hacer doble clic, y una carpeta con lo demas:
+
+      TEST THIS COMPUTER.bat   Corre esto PRIMERO en cada computadora
+                               nueva. Revisa la maquina.
+      START YOBOT.bat          Abre la pagina de control de Yobot.
+      STOP YOBOT.bat           Detiene todo, sin importar como inicio.
+
+      Utilities\               El show, el ajedrez y la version.
+
+  Las carpetas OhbotPi2, Chess y python son la maquinaria. Nunca hace
+  falta abrirlas, y tienen que quedarse donde estan.
+
+
+---------------------------------------------------------------------------
+  EMPIEZA AQUI
+---------------------------------------------------------------------------
+
+  1. Doble clic en   TEST THIS COMPUTER.bat
+
+     Tarda como un minuto. Revisa si esta maquina puede correr Yobot y
+     si alcanza a ver el robot, y te lo dice en palabras claras.
+
+  2. Doble clic en   START YOBOT.bat
+
+     Se abre una ventana negra y despues tu navegador. Esa pagina web
+     es el panel de control: todos los botones estan ahi.
+
+  3. Cuando termines, doble clic en   STOP YOBOT.bat
+
+  DEJA LA VENTANA NEGRA ABIERTA mientras Yobot esta funcionando. No es
+  un mensaje de error, es el motor. Si la cierras, el robot se detiene.
+
+  Yobot espera a estar listo antes de abrir tu navegador, asi que la
+  pagina deberia estar lista cuando aparezca. La primera vez en una
+  computadora nueva tarda mas - es Python despertando desde la memoria
+  - y despues es mas rapido.
+
+
+---------------------------------------------------------------------------
+  CONECTAR EL ROBOT
+---------------------------------------------------------------------------
+
+  El robot se conecta por USB. Conectalo ANTES de iniciar Yobot. Si lo
+  conectas despues, detén e inicia otra vez para que lo reconozca.
+
+  Puedes usar Yobot sin robot conectado. La pagina de control
+  funciona; simplemente no hay nada que mover.
+
+  LA PRIMERA VEZ, EL FIREWALL DE WINDOWS VA A PREGUNTAR. Haz clic en
+  "Permitir acceso". Yobot no esta saliendo a internet ahi: esta
+  abriendo una pagina para tu propio navegador, en tu propia maquina.
+  Si lo rechazas, la pagina no carga.
+
+
+---------------------------------------------------------------------------
+  EN LA CARPETA UTILITIES
+---------------------------------------------------------------------------
+
+  YOBOT SHOW.bat            El show grabado. Con voz y todo.
+                            NO NECESITA INTERNET NI CUENTAS.
+
+  GET THE CHESS ENGINE.bat  Correr una vez, con internet, si quieres
+                            jugar ajedrez.
+  PLAY A HUMAN CHESS.bat    Una persona contra el robot.
+  ROBOT v ROBOT CHESS.bat   Dos robots jugando entre si.
+
+  VERSION.txt               Exactamente cual version es esta. Citala
+                            si le pides ayuda a alguien.
+
+  EL SHOW ES EL QUE HAY QUE USAR en un salon donde no se puede confiar
+  en el wifi. Suena desde grabaciones que ya estan en esta memoria,
+  asi que no necesita nada de afuera.
+
+
+---------------------------------------------------------------------------
+  QUE NECESITA UNA CUENTA
+---------------------------------------------------------------------------
+
+  Para que Yobot ESCUCHE y HABLE CON SUS PROPIAS PALABRAS, en vez de
+  reproducir grabaciones, necesita una cuenta de Microsoft Azure. El
+  uso ligero cuesta centavos. Es la unica cuenta indispensable.
+
+  Para que Yobot CONVERSE, necesita ademas una cuenta de inteligencia
+  artificial: OpenAI, Anthropic, Google Gemini o Groq. O bien Ollama
+  corriendo en tu propia computadora, que no necesita cuenta.
+
+  NO TIENES QUE EDITAR NINGUN ARCHIVO. Inicia Yobot y, en la pagina
+  que se abre, haz clic en "Settings & Keys". Pega ahi tus llaves y el
+  sistema prueba cada una y te dice si sirve.
+
+  Esta memoria llega sin ninguna llave. Cuando agregas las tuyas se
+  guardan EN LA MEMORIA, asi que solo lo haces una vez - y tambien las
+  tiene cualquiera a quien le prestes la memoria. Vale la pena
+  recordarlo antes de prestarla.
+
+  Yobot te avisa cuando falta algo, en vez de arrancar y fallar en
+  silencio. El ajedrez no abre sin su motor, y el robot conversador no
+  arranca sin llave de voz.
+
+
+---------------------------------------------------------------------------
+  AJEDREZ
+---------------------------------------------------------------------------
+
+  Los tres archivos estan en Utilities. En este orden:
+
+  1. GET THE CHESS ENGINE.bat - una sola vez, con internet.
+
+     El motor es un programa aparte de 109 MB que se llama Stockfish,
+     con su propia licencia, asi que se descarga de sus creadores en
+     vez de venir aqui. Despues de esa vez, el ajedrez tambien
+     funciona sin internet.
+
+  2. PLAY A HUMAN CHESS.bat   - una persona juega contra el robot.
+  3. ROBOT v ROBOT CHESS.bat  - dos robots juegan entre si.
+
+  El tablero y el juego no necesitan cuentas. Solo los comentarios del
+  robot, y eso es la llave de Azure de arriba.
+
+
+---------------------------------------------------------------------------
+  TRES TRAMPAS DE WINDOWS QUE CONVIENE CONOCER
+---------------------------------------------------------------------------
+
+  DESCOMPRIMIR TARDA VARIOS MINUTOS y parece que se trabo. Aqui hay
+  varios miles de archivos pequenos - casi todos pedacitos de Python -
+  y Windows revisa cada uno al pasar. Es lento en una computadora
+  rapida y mas lento en una vieja.
+
+  Dejalo terminar. Una copia a medio descomprimir se ve perfectamente
+  bien y despues falla de maneras que nadie logra entender. Lo mismo
+  al borrarla, si algun dia lo haces.
+
+  SI DESCARGASTE ESTO COMO ZIP: Windows te deja ver dentro de un ZIP
+  como si fuera una carpeta normal. Yobot funciona a medias desde ahi,
+  de formas que te hacen perder la tarde. Haz clic derecho en el ZIP,
+  elige "Extraer todo", y copia el contenido de la carpeta real a la
+  memoria.
+
+  WINDOWS PUEDE ADVERTIRTE sobre un archivo que descargaste: "Windows
+  protegio su PC". Haz clic en "Mas informacion" y luego en "Ejecutar
+  de todas formas". Si aun asi se niega, clic derecho en el archivo,
+  Propiedades, y marca "Desbloquear" abajo.
+
+
+---------------------------------------------------------------------------
+  LLEVARLO FUERA DE LA MEMORIA
+---------------------------------------------------------------------------
+
+  Puedes copiar todo esto a un disco duro y sigue funcionando. Nada
+  recuerda la letra de la unidad, asi que si E: pasa a ser F: en otra
+  maquina no se rompe nada.
+
+  Manten las carpetas juntas. python, OhbotPi2 y Chess tienen que
+  quedar una al lado de la otra, porque asi es como se encuentran.
+
+
+---------------------------------------------------------------------------
+  UNA VERSION MAS NUEVA
+---------------------------------------------------------------------------
+
+  Esta version no tiene boton de actualizar. Descarga el ZIP nuevo,
+  extraelo, y copia el contenido encima de esta memoria.
+
+  Guarda lo tuyo: si agregaste llaves, copia despues OhbotPi2\.env. La
+  calibracion de tu robot y las secuencias que hayas hecho estan en
+  OhbotPi2\ohbotData y OhbotPi2\sequences.
+
+
+---------------------------------------------------------------------------
+  CUANDO ALGO SALE MAL
+---------------------------------------------------------------------------
+
+  CORRE TEST THIS COMPUTER.bat OTRA VEZ. Esta escrito para explicar lo
+  que encuentra, no solo para aprobar o reprobar, y detecta casi todo.
+
+  No cambio nada despues de actualizar?
+      El navegador te esta mostrando una copia guardada de la pagina.
+      Manten Ctrl y presiona F5.
+
+  Te saluda y despues se queda callado?
+      Esta escuchando el microfono equivocado. Una laptop suele tener
+      dos o tres y Windows no siempre elige el que tu quieres. La
+      pagina de Settings te deja escoger.
+
+  El ajedrez dice que falta algo?
+      Corre GET THE CHESS ENGINE.bat en Utilities, con internet.
+
+  Windows bloqueo un archivo?
+      Clic derecho, Propiedades, marca "Desbloquear" abajo, Aceptar.
+
+  Cuando le pidas ayuda a alguien, abre Utilities\VERSION.txt y citalo.
+  Dice exactamente cual version tienes, y eso convierte una adivinanza
+  en una respuesta.
+
+===========================================================================

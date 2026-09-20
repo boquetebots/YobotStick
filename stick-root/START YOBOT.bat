@@ -2,15 +2,13 @@
 REM ===========================================================================
 REM  START YOBOT.bat  -  opens the Yobot control page in your browser
 REM ===========================================================================
-REM  This file works in TWO places, on purpose:
+REM  This file lives at the top of the Yobot drive, next to READ ME FIRST.txt.
+REM  It looks for OhbotPi2\Windows beside itself first, then inside a
+REM  YobotStick folder, so it also works if the whole lot is moved onto a
+REM  hard disk later. Nothing here remembers a drive letter.
 REM
-REM    E:\START YOBOT.bat                 <- the root of the drive
-REM    E:\YobotStick\START YOBOT.bat      <- inside the project folder
-REM
-REM  It looks for OhbotPi2\Windows beside itself first, then one level down
-REM  inside YobotStick. So you can keep a copy at the root of the drive where
-REM  it is the obvious thing to click, and it still works if the folder is
-REM  moved onto a hard disk later.
+REM  The other buttons - the show and the chess - are in Utilities, and find
+REM  their way from one level down.
 REM
 REM  A real batch file, never a shortcut: a .lnk remembers the drive letter it
 REM  was made on and this stick will not always be the same letter.

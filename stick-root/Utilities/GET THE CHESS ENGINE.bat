@@ -48,9 +48,18 @@ setlocal
 set "HERE=%~dp0"
 if "%HERE:~-1%"=="\" set "HERE=%HERE:~0,-1%"
 
+REM  Find the Chess folder. This file lives in Utilities\, one level down, so
+REM  the usual answer is the folder above. Beside-me and the old YobotStick\
+REM  location are tried too, so it still works if it is moved back up.
 set "CHESS=%HERE%\Chess"
-if not exist "%CHESS%\chess_server.py" set "CHESS=%HERE%\YobotStick\Chess"
-if not exist "%CHESS%\chess_server.py" goto WRONGPLACE
+if exist "%CHESS%\chess_server.py" goto GOTCHESS
+for %%I in ("%HERE%\..") do set "CHESS=%%~fI\Chess"
+if exist "%CHESS%\chess_server.py" goto GOTCHESS
+set "CHESS=%HERE%\YobotStick\Chess"
+if exist "%CHESS%\chess_server.py" goto GOTCHESS
+goto WRONGPLACE
+
+:GOTCHESS
 
 set "URL=https://github.com/official-stockfish/Stockfish/releases/download/sf_18/stockfish-windows-x86-64.zip"
 set "ZIP=%CHESS%\stockfish-download.zip"
@@ -157,9 +166,9 @@ exit /b 1
 echo.
 echo   [X] Cannot find the Chess folder.
 echo.
-echo       This file belongs at the top level of the Yobot stick, beside the
-echo       folders called Chess, OhbotPi2 and python. If you copied it
-echo       somewhere on its own, put it back.
+echo       This file belongs in the Utilities folder on the Yobot drive, with
+echo       the Chess, OhbotPi2 and python folders one level above it. If it
+echo       was copied somewhere on its own, put it back.
 echo.
 pause
 endlocal

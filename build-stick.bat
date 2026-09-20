@@ -516,7 +516,12 @@ copy /y "%ODATA%\robots\Ohbot.omd" "%ODATA%\MotorDefinitionsv21.omd" >> "%LOG%" 
 if errorlevel 1 goto FAIL
 
 REM  Written with no trailing newline, to match what the working stick has.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[IO.File]::WriteAllText('%ODATA%\active_robot.txt','ohbot')" >> "%LOG%" 2>&1
+REM  'Ohbot' with the capital, to match the profile file Ohbot.omd. The
+REM  Launcher compares the two exactly, and lower case ("rubia" against
+REM  Rubia.omd) is what made the dropdown show the wrong robot on 2026-09-20.
+REM  robot_profiles.get_active() resolves the case too now, so this is belt
+REM  and braces - but written right beats written wrong and corrected later.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[IO.File]::WriteAllText('%ODATA%\active_robot.txt','Ohbot')" >> "%LOG%" 2>&1
 powershell -NoProfile -ExecutionPolicy Bypass -Command "[IO.File]::WriteAllText('%ODATA%\language.txt',\"es`r`n\")" >> "%LOG%" 2>&1
 
 REM  The one that costs hardware if it is wrong. Checked by name, on purpose,
@@ -533,6 +538,30 @@ if not exist "%ODATA%\active_robot.txt" (
 )
 call :SAY "        ok - calibration set from the generic Ohbot profile."
 
+REM  --- 8a3. the language this drive starts in -------------------------------
+REM  i18n.js carries two constants and its own comment says "change these two
+REM  lines per stick". DEFAULT_LANG is what a browser shows the FIRST time it
+REM  opens a Yobot page on that computer; after that the language pill wins.
+REM
+REM  Patched here rather than changed in the robot repo, because i18n.js is
+REM  shared with the Pi, the Mac and the installed route, and this choice is
+REM  about this download and not about those.
+REM
+REM  Note that ohbotData\language.txt is NOT what the interface reads. The
+REM  page WRITES that file, to tell Python which language to speak. Shipping
+REM  language.txt on its own did nothing on 2026-09-20 - the first page load
+REM  posted 'en' straight over the top of it.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$f='%STICK%\OhbotPi2\i18n.js'; $t=[IO.File]::ReadAllText($f); $n=$t.Replace(\"const DEFAULT_LANG = 'en';\",\"const DEFAULT_LANG = 'es';\"); if($n -eq $t){exit 1}; [IO.File]::WriteAllText($f,$n)" >> "%LOG%" 2>&1
+if errorlevel 1 (
+    call :SAY "        [X] Could not set the stick's default language."
+    call :SAY "            i18n.js no longer has the line this expects:"
+    call :SAY "                const DEFAULT_LANG = 'en';"
+    call :SAY "            Reformatted, or already changed upstream. Stopping"
+    call :SAY "            rather than shipping an English stick by accident."
+    goto FAIL
+)
+call :SAY "        ok - this drive starts in Spanish."
+
 REM  --- 8b. the corrected chess launchers ------------------------------------
 REM  The repo versions look for %USERPROFILE%\yobot-venv BEFORE the stick's own
 REM  Python, which is right on an installed machine and wrong here. See
@@ -544,6 +573,7 @@ REM  --- 8c. the files people actually click ----------------------------------
 xcopy /e /i /y /q "%REPO%\stick-root\*" "%STICK%\" >> "%LOG%" 2>&1
 if errorlevel 1 goto FAIL
 
+if not exist "%STICK%\Utilities" mkdir "%STICK%\Utilities"
 (
 echo Yobot on a Stick  v%VERSION%
 echo Built      %DATE%
@@ -552,7 +582,7 @@ echo Chess      %CHESS_SHA%
 echo Python     3.11.9 embeddable
 echo Recordings %NWAV% files
 echo Stockfish  18  ^(sf_18, x86-64 plain build^) - fetched, not included
-) > "%STICK%\VERSION.txt"
+) > "%STICK%\Utilities\VERSION.txt"
 
 REM  --- 8d. is everything the manifest promises actually here? ---------------
 REM  The half of the allow list that earns its keep. Dropping the wrong file is
