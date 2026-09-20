@@ -123,6 +123,50 @@ OhbotPi2\Windows\yobot.bat
 
 
 # ---------------------------------------------------------------------------
+#  [prune]  OhbotPi2\ohbotData
+# ---------------------------------------------------------------------------
+#  Added 2026-09-20, after a stick shipped without the live calibration and
+#  the robot was driven to its mechanical stops.
+#
+#  MotorDefinitionsv21.omd, active_robot.txt and language.txt are gitignored -
+#  they are copied from the working stick by stick-extras.txt, after this
+#  prune runs. They are listed here so the check in step 8d confirms they
+#  actually arrived.
+#
+#  NOT listed, on purpose:
+#    MotorDefinitionsYobot.omd - THE DANGEROUS ONE. It is in git, it is from
+#        May, and it was superseded by the 3-point calibration on 2026-08-05.
+#        It has no Center values, an inverted LidBlink, and HeadTurn allowed
+#        0-970 against a safe 200-720. It is what a stick falls back to when
+#        the live calibration is absent, and it is why the robot had a fit on
+#        2026-09-20. It must not ship.
+#    MD_old_*.omd, archive\ - old calibrations, not in git anyway.
+#    robots\*.bak - backups.
+
+OhbotPi2\ohbotData\active_robot.txt
+OhbotPi2\ohbotData\language.txt
+OhbotPi2\ohbotData\MotorDefinitionsv21.omd
+OhbotPi2\ohbotData\ohbot.obe
+OhbotPi2\ohbotData\robots
+
+
+# ---------------------------------------------------------------------------
+#  Required, but not pruned
+# ---------------------------------------------------------------------------
+#  Listed so step 8d checks they are present. Their folders are not filtered,
+#  so nothing here is used to delete anything.
+#
+#  yobot.ico was never gitignored - just never committed. It is in the robot
+#  repo now. autorun.inf names it, so it is checked here.
+#
+#  Ohbot.omd is the generic starting calibration the build copies to
+#  MotorDefinitionsv21.omd. If it goes missing, a fresh stick has no motor
+#  limits at all, so it is worth failing the build over.
+
+OhbotPi2\gui\yobot.ico
+OhbotPi2\ohbotData\robots\Ohbot.omd
+
+# ---------------------------------------------------------------------------
 #  [prune]  Chess
 # ---------------------------------------------------------------------------
 #  NOT listed, on purpose:

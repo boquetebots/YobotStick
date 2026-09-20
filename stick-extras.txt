@@ -1,0 +1,49 @@
+# ===========================================================================
+#  stick-extras.txt  -  what a stick needs that GIT CANNOT PROVIDE
+# ===========================================================================
+#
+#  Copied from the working stick at D:\Projects\YobotStick after the manifest
+#  prune. build-stick.bat REFUSES TO BUILD if anything here is missing.
+#
+#  KEEP THIS LIST AS SHORT AS POSSIBLE. Every entry is a dependency on one
+#  particular computer, which is the thing that makes a build unreproducible
+#  and is how a stick ends up missing something nobody noticed.
+#
+#  It was five entries for about an hour on 2026-09-20. Four of those turned
+#  out to belong in git instead:
+#
+#    MotorDefinitionsv21.omd   per-machine, gitignored on purpose. The build
+#    active_robot.txt          now GENERATES all three from the shared
+#    language.txt              profile ohbotData\robots\Ohbot.omd, which is
+#                              in git. Nothing is copied off anyone's stick.
+#    gui\yobot.ico             was never gitignored, just never committed.
+#                              Now in the repo where it belongs.
+#
+#  WHY IT MATTERS THAT THIS LIST IS RIGHT
+#  --------------------------------------
+#  Both times something gitignored was left out of a build, a person found it
+#  rather than the build:
+#
+#    voice_cache            v1.0 shipped without it. The offline show - the
+#                           one thing the guides say to trust with no wifi -
+#                           would have been silent.
+#    MotorDefinitionsv21    v1.0 shipped without it. THE ROBOT THRASHED
+#                           against its mechanical stops and had to be
+#                           unplugged. That one can damage hardware.
+#
+#  Both had the same cause: the manifest was checked one level deep. Top-level
+#  names were compared against the working stick; subfolder CONTENTS were
+#  taken on trust. voice_cache was caught only because it is a top-level name.
+#
+#  Audited every folder 2026-09-20 - gui, launcher, calibration, sequences,
+#  ohbotData, ohbotData\robots, Windows, Chess, Chess\show. To re-check later,
+#  compare a built ZIP against the working stick FOLDER BY FOLDER.
+#
+#  A folder named here is copied whole.
+# ===========================================================================
+
+
+# The show's recordings. 24 bilingual pairs, about 16 MB of .wav, gitignored
+# because they are large and regenerable from Azure. Genuinely does not belong
+# in git, so this one stays. Without it YOBOT SHOW has no voice.
+OhbotPi2\voice_cache

@@ -52,11 +52,12 @@ REM  OhbotPi2 on both machines; the repo it came from never was.
 set "OHBOT_URL=https://github.com/boquetebots/OhbotPi.git"
 set "CHESS_URL=https://github.com/boquetebots/YobotChess.git"
 
-REM  Where the show's recordings come from. They are gitignored - 16 MB of
-REM  .wav, regenerable - so they cannot come out of a clone, and without them
-REM  the offline show is silent. Note this is the working STICK, not
-REM  D:\Projects\OhbotPi2, which has no voice_cache folder at all.
-set "VOICE_SRC=D:\Projects\YobotStick\OhbotPi2\voice_cache"
+REM  The working stick. Several things a stick needs are gitignored and so
+REM  cannot come out of a clone - the recordings, the live motor calibration,
+REM  the drive icon. stick-extras.txt lists them and they are copied from
+REM  here. Note this is the working STICK, not D:\Projects\OhbotPi2, which
+REM  has neither voice_cache nor a live calibration.
+set "STICK_SRC=D:\Projects\YobotStick"
 
 set "PY_URL=https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
 set "GETPIP_URL=https://bootstrap.pypa.io/get-pip.py"
@@ -377,22 +378,74 @@ if not exist "%MANIFEST%" (
 
 call :SAY "  [7/9] Cutting down to what a stick actually contains..."
 
-REM  Keys and logs first. git archive cannot produce these, but belt and
-REM  braces is the right posture for a public download.
+REM  Keys and logs first. git archive cannot produce a .env, but belt and
+REM  braces is the right posture for a public download - and the prune below
+REM  would only remove these as a side effect of them not being listed, which
+REM  is not the same as deliberately deleting them.
 if exist "%STICK%\OhbotPi2\.env" del /q "%STICK%\OhbotPi2\.env"
 if exist "%STICK%\Chess\.env" del /q "%STICK%\Chess\.env"
 if exist "%STICK%\OhbotPi2\git_keys.txt" del /q "%STICK%\OhbotPi2\git_keys.txt"
+
+REM  Logs can hold transcripts of what people said to the robot.
 if exist "%STICK%\OhbotPi2\logs" rd /s /q "%STICK%\OhbotPi2\logs"
 if exist "%STICK%\Chess\logs" rd /s /q "%STICK%\Chess\logs"
+
+REM  __pycache__ folders nest deeper than the three pruned folders, so the
+REM  manifest never sees them. This is the only thing that removes them.
 for /d /r "%STICK%" %%d in (__pycache__) do if exist "%%d" rd /s /q "%%d"
 
-REM  Now the allow list, over the three folders that need filtering. Anything
-REM  deeper comes across whole.
+REM  --- who decides what goes: prune-list.ps1, not findstr -----------------
+REM  findstr got this wrong twice in one hour, silently both times: once
+REM  because the manifest had LF line endings (it then matched nothing and
+REM  deleted all 105 files it looked at), and once on the single entry whose
+REM  name starts with a dot, .env.example, because of how it handles a
+REM  backslash followed by a dot in a supposedly literal search.
+REM
+REM  82 right out of 83 is worse than obviously broken. prune-list.ps1 does
+REM  plain string comparison with no escaping rules and reads either kind of
+REM  line ending. It writes the list; this script does the deleting.
+if not exist "%REPO%\prune-list.ps1" (
+    call :SAY "        [X] prune-list.ps1 is missing from the repo folder."
+    goto FAIL
+)
+powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\prune-list.ps1" -Manifest "%MANIFEST%" -Stick "%STICK%" -OutDir "%WORK%" >> "%LOG%" 2>&1
+if errorlevel 1 (
+    call :SAY "        [X] Could not work out what to drop. See the log."
+    goto FAIL
+)
+if not exist "%WORK%\to-drop.txt" (
+    call :SAY "        [X] No drop list was produced. See the log."
+    goto FAIL
+)
+
 set "DROPPED=0"
-call :PRUNE "OhbotPi2"
-call :PRUNE "OhbotPi2\Windows"
-call :PRUNE "Chess"
-call :SAY "        %DROPPED% item(s) dropped - each one listed in the log."
+set "KEPT=0"
+for /f "usebackq delims=" %%E in ("%WORK%\to-drop.txt") do call :DROP "%%E"
+for /f "usebackq tokens=1,2" %%A in ("%WORK%\prune-counts.txt") do set "KEPT=%%A"
+
+call :SAY "        %KEPT% kept, %DROPPED% dropped - each drop listed in the log."
+
+REM  --- the sanity gate ------------------------------------------------------
+REM  A healthy prune drops maybe thirty things and keeps eighty. If it drops
+REM  MORE than it keeps, the manifest is not being read properly - the source
+REM  tree is not suddenly full of junk. Stop here and say so plainly, instead
+REM  of deleting the whole stick and reporting eighty confusing MISSING lines
+REM  two steps later, which is what happened the first time.
+REM
+REM  A guard that turns a silent catastrophe into one clear sentence is worth
+REM  more than the check that eventually caught it.
+if %DROPPED% GTR %KEPT% (
+    call :SAY ""
+    call :SAY "        [X] STOP. That dropped more than it kept, which cannot be"
+    call :SAY "            right - it means the manifest is not being matched,"
+    call :SAY "            not that the robot project is full of rubbish."
+    call :SAY ""
+    call :SAY "            Look at stick-manifest.txt and at to-drop.txt in the"
+    call :SAY "            build folder - between them they will show which side"
+    call :SAY "            of the comparison went wrong."
+    call :SAY "            Nothing was published and nothing of yours was touched."
+    goto FAIL
+)
 call :SAY ""
 
 REM ===========================================================================
@@ -401,31 +454,84 @@ REM ===========================================================================
 
 call :SAY "  [8/9] Adding the recordings and the stick's own files..."
 
-REM  --- 8a. voice_cache ------------------------------------------------------
-REM  THE OFFLINE SHOW IS THE WHOLE POINT OF THIS DOWNLOAD, and it cannot work
-REM  without these. The recordings are deliberately gitignored - they are 16 MB
-REM  of .wav and regenerable - so a git-only build produces a stick whose
-REM  headline feature is silent. The v1.0 ZIP had exactly that fault.
+REM  --- 8a. everything git cannot provide -----------------------------------
+REM  Driven by stick-extras.txt. Was a single hardcoded voice_cache copy until
+REM  2026-09-20, when a stick shipped without the live motor calibration and
+REM  THE ROBOT THRASHED AGAINST ITS STOPS and had to be unplugged.
 REM
-REM  They are copied from disk instead. A .wav cannot carry an API key, so
-REM  this does not weaken the no-keys-in-the-download guarantee.
-REM
-REM  Note the source: the working stick, NOT D:\Projects\OhbotPi2, which has
-REM  no voice_cache folder at all.
-if not exist "%VOICE_SRC%" (
-    call :SAY "        [X] No recordings found at:"
-    call :SAY "            %VOICE_SRC%"
-    call :SAY ""
-    call :SAY "            Without these, YOBOT SHOW has no voice - and that is"
-    call :SAY "            the one thing the guides tell people to rely on with"
-    call :SAY "            no internet. Not shipping a silent stick."
+REM  The fault was not the missing file, it was the mechanism: one special
+REM  case for the one gitignored thing anybody had thought of. There were
+REM  four. Now there is a list, and the build stops if any of it is absent.
+if not exist "%REPO%\copy-extras.ps1" (
+    call :SAY "        [X] copy-extras.ps1 is missing from the repo folder."
     goto FAIL
 )
-xcopy /e /i /y /q "%VOICE_SRC%" "%STICK%\OhbotPi2\voice_cache\" >> "%LOG%" 2>&1
-if errorlevel 1 goto FAIL
+if not exist "%REPO%\stick-extras.txt" (
+    call :SAY "        [X] stick-extras.txt is missing from the repo folder."
+    goto FAIL
+)
+if not exist "%STICK_SRC%" (
+    call :SAY "        [X] Cannot see the working stick at:"
+    call :SAY "            %STICK_SRC%"
+    call :SAY "            The recordings and the motor calibration live there and"
+    call :SAY "            cannot come from git. Not shipping without them."
+    goto FAIL
+)
+powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\copy-extras.ps1" -List "%REPO%\stick-extras.txt" -Source "%STICK_SRC%" -Stick "%STICK%" >> "%LOG%" 2>&1
+if errorlevel 1 (
+    call :SAY "        [X] Something in stick-extras.txt could not be copied."
+    call :SAY "            See the log. Nothing was published."
+    goto FAIL
+)
 set "NWAV=0"
 for %%F in ("%STICK%\OhbotPi2\voice_cache\*.wav") do set /a NWAV+=1
-call :SAY "        ok - %NWAV% recordings copied in."
+call :SAY "        ok - extras copied in, %NWAV% recordings among them."
+
+REM  --- 8a2. the per-machine files, GENERATED not copied --------------------
+REM  These three are gitignored on purpose. The robot repo's own .gitignore
+REM  explains why: "Real robot profiles live in ohbotData/robots/ and ARE
+REM  shared." They describe one particular machine, so they should not be in
+REM  git - and equally should not be copied off Michael's stick, which would
+REM  ship his robot's state to strangers.
+REM
+REM  So they are made here, from ohbotData\robots\Ohbot.omd, which IS in git.
+REM  Ohbot.omd is a stock Ohbot's calibration - conservative ranges, proper
+REM  Center values - intended as a starting point, to be replaced by running
+REM  Calibration.
+REM
+REM  Before this existed, a stick had no live calibration at all, the library
+REM  fell back to a stale file from May with no Center values and an inverted
+REM  eyelid, and THE ROBOT THRASHED AGAINST ITS STOPS. 2026-09-20.
+set "ODATA=%STICK%\OhbotPi2\ohbotData"
+
+if not exist "%ODATA%\robots\Ohbot.omd" (
+    call :SAY "        [X] ohbotData\robots\Ohbot.omd is not in the robot repo."
+    call :SAY "            That is the generic starting calibration, and without"
+    call :SAY "            it a fresh stick has no motor limits at all. Push it"
+    call :SAY "            to OhbotPi first - see BUILD.md."
+    goto FAIL
+)
+
+copy /y "%ODATA%\robots\Ohbot.omd" "%ODATA%\MotorDefinitionsv21.omd" >> "%LOG%" 2>&1
+if errorlevel 1 goto FAIL
+
+REM  Written with no trailing newline, to match what the working stick has.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[IO.File]::WriteAllText('%ODATA%\active_robot.txt','ohbot')" >> "%LOG%" 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[IO.File]::WriteAllText('%ODATA%\language.txt',\"es`r`n\")" >> "%LOG%" 2>&1
+
+REM  The one that costs hardware if it is wrong. Checked by name, on purpose,
+REM  as well as by the manifest below - belt and braces for the only file on
+REM  this stick whose absence can damage a robot.
+if not exist "%ODATA%\MotorDefinitionsv21.omd" (
+    call :SAY "        [X] The live motor calibration was not created."
+    call :SAY "            Without it the robot is driven to its mechanical stops."
+    goto FAIL
+)
+if not exist "%ODATA%\active_robot.txt" (
+    call :SAY "        [X] active_robot.txt was not created."
+    goto FAIL
+)
+call :SAY "        ok - calibration set from the generic Ohbot profile."
 
 REM  --- 8b. the corrected chess launchers ------------------------------------
 REM  The repo versions look for %USERPROFILE%\yobot-venv BEFORE the stick's own
@@ -499,15 +605,6 @@ exit /b 0
 REM ===========================================================================
 REM  Helpers
 REM ===========================================================================
-
-REM  Delete everything in folder %~1 that the manifest does not name.
-:PRUNE
-if not exist "%STICK%\%~1" exit /b 0
-for /f "delims=" %%E in ('dir /b "%STICK%\%~1" 2^>nul') do (
-    findstr /x /i /c:"%~1\%%E" "%MANIFEST%" >nul 2>&1
-    if errorlevel 1 call :DROP "%~1\%%E"
-)
-exit /b 0
 
 :DROP
 call :SAY "        - dropped  %~1"
